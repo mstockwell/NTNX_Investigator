@@ -5,10 +5,30 @@ import json
 import sys
 import requests
 
+REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1/'
+base_url = REST_URL_SUFFIX
+
+class RestConnection():
+    def __init__(self):
+        self.session = requests.Session()
+
+    def create_connection (self, username, password):
+        # Creating REST client session for server connection
+        self.session.auth = (username, password)
+        self.session.verify = False
+        self.session.headers.update({'Content-Type': 'application/json; charset=utf-8'})
+        return session
+
+    def getClusterInformation(self):
+        clusterURL = base_url + "/cluster"
+        serverResponse = self.session.get(clusterURL)
+        return json.loads(serverResponse.text)
+
 # create application
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = '0234719873yew93218746'
+
 
 @app.route('/')
 def HomePage():
@@ -19,35 +39,25 @@ def HomePage():
 def login():
     error = None
     if request.method == 'POST':
-        ipaddress=request.form['ipaddress']
+        ip_address = request.form['ip_address']
         username = request.form['username']
         password = request.form['password']
-        BASE_URL = 'https://%s:9440/PrismGateway/services/rest/v1/'
         global base_url
-        base_url = BASE_URL % ipaddress
-        connection = requests.Session()
-        connection.auth = (username, password)
-        connection.verify = False
-        connection.headers.update({'Content-Type': 'application/json; charset=utf-8'})
-        clusterURL = base_url + "/cluster"
-        ServerResponse = connection.get(clusterURL)
-        return "Response Code %s" % json.loads(ServerResponse.text)
+        base_url = REST_URL_SUFFIX % ip_address
+        rc.create_connection(username, password)
+        return "Status %s" % rc.__class__
     return render_template('login.html', error=error)
 
 
 @app.route('/cluster')
 def cluster_info():
-    # BASE_URL = 'https://%s:9440/PrismGateway/services/rest/v1/'
-    # base_url = BASE_URL % ipaddress
-    print "This is the base_url %s" % base_url
-    clusterURL = base_url + "/cluster"
-    serverResponse = session.get(clusterURL)
-    jsonload = json.loads(serverResponse.text)
-    return "<h2> Cluster Name: %s <h2>" % jsonload.get('name')
+    cluster = rc.getClusterInformation()
+    return "Cluster Name: %s" % cluster.get('name')
 
 
 if __name__ == '__main__':
     try:
+        rc = RestConnection()
         app.run()
     except Exception as ex:
         print ex

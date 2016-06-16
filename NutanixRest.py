@@ -60,7 +60,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Cluster Id'
+    status, c = testRestApi.getClusterInformation()
+    return "Cluster is %s" % c.get('name')
 
 if __name__ == "__main__":
     try:
