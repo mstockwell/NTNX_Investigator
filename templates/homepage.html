@@ -7,11 +7,28 @@
   </head>
   <body>
     <div class="container">
-      <h2>Welcome to Nutanix Investigator</h2>
+      <center>
+          <h1>  Welcome to Nutanix Investigator</h1>
       <br>
+      <div class="container">
+      <center><h3>Connect to your Nutanix cluster</h3>
       <form action="" method="post">
-      <p>Click <a href="/">here</a> to connect to a Nutanix cluster</p>
-       </form>
+        <input type="text" placeholder="" name="ip_address" value="{{
+          request.form.ip_address }}">
+          <br>
+        <input type="text" placeholder="Username" name="username" value="{{
+          request.form.username }}">
+          <br>
+         <input type="password" placeholder="Password" name="password" value="{{
+          request.form.password }}">
+          <br><br>
+        <input class="btn btn-default" type="submit" value="Login">
+      </form></center>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+      </center>
     </div>
   </body>
 </html>

@@ -7,7 +7,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>Connect to a Nutanix Cluster</h1>
+      <center><h1>Connect to a Nutanix Cluster</h1>
       <br>
       <form action="" method="post">
         <input type="text" placeholder="ip_address" name="ip_address" value="{{
@@ -20,7 +20,7 @@
           request.form.password }}">
           <br><br>
         <input class="btn btn-default" type="submit" value="Login">
-      </form>
+      </form></center>
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}
       {% endif %}

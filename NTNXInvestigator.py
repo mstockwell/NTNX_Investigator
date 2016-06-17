@@ -5,7 +5,6 @@ import json
 import sys
 import requests
 import datetime
-import time
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 base_url = REST_URL_SUFFIX
@@ -46,15 +45,8 @@ app.config.from_object(__name__)
 app.secret_key = '0234719873yew93218746'
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def HomePage():
-    if request.method == 'POST':
-        return redirect('login')
-    return render_template('homepage.html')
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
     error = None
     if request.method == 'POST':
         ip_address = request.form['ip_address']
@@ -63,8 +55,13 @@ def login():
         global base_url
         base_url = REST_URL_SUFFIX % ip_address
         rc.create_connection(username, password)
-        return "Status %s" % rc.__class__
-    return render_template('login.html', error=error)
+        return redirect(url_for('querymainpage'))
+    return render_template('homepage.html', error=error)
+
+
+@app.route('/querymainpage')
+def querymainpage():
+        return render_template('querymainpage.html')
 
 
 @app.route('/cluster')
