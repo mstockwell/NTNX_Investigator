@@ -1,10 +1,13 @@
 from flask import Flask, request, g, redirect, url_for, \
     abort, session, render_template, flash
 
+from json2html import *
+
 import json
 import sys
 import requests
 import datetime
+import time
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 base_url = REST_URL_SUFFIX
@@ -21,28 +24,24 @@ class RestConnection():
         self.session.headers.update({'Content-Type': 'application/json; charset=utf-8'})
         return session
 
-    def getClusterInformation(self):
-        clusterURL = base_url + "/cluster"
-        serverResponse = self.session.get(clusterURL)
-        return json.loads(serverResponse.text)
-
-    def getEventsInformation(self):
-        start_time = datetime.datetime(2016, 6, 16, 23, 30, 55, 000000)
-        st = start_time.strftime("%s") + start_time.strftime("%f")
-        current_time = datetime.datetime.utcnow()
-        et = current_time.strftime("%s") + current_time.strftime("%f")
-        start_time_url = 'startTimeInUsecs=' + st
-        end_time_url = '&endTimeInUsecs=' + et
-        eventsURL = base_url + "/events?" + start_time_url + end_time_url + "&entityType=cluster" + "&count=20"
-        print "eventsUrl %s" % eventsURL
+    def getEventsInformation(self, investigate_date):
+        start_time = time.mktime(datetime.datetime.strptime(investigate_date, "%Y-%m-%d").timetuple())
+        end_time = start_time + (24*60*60)
+        start_time_url = str(int(start_time)) + "000000"
+        end_time_url = str(int(end_time)) + "000000"
+        eventsURL = base_url + "/events?" + "startTimeInUsecs=" + start_time_url + "&endTimeInUsecs=" + end_time_url
         serverResponse = self.session.get(eventsURL)
-        return json.loads(serverResponse.text)
+        json_events = json.loads(serverResponse.text)
+        print json_events.keys()
+        for element in json_events['entities']:
+            print element.get('contextValues')
+        return json_events
 
 
-# create application
+
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.secret_key = '0234719873yew93218746'
+app.secret_key = '023aM47zz19Sx873yew9321Pl8746'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -53,27 +52,20 @@ def HomePage():
         username = request.form['username']
         password = request.form['password']
         global base_url
-        base_url = REST_URL_SUFFIX % ip_address
+        base_url = REST_URL_SUFFIX%ip_address
         rc.create_connection(username, password)
         return redirect(url_for('querymainpage'))
     return render_template('homepage.html', error=error)
 
 
-@app.route('/querymainpage')
+@app.route('/querymainpage', methods=['GET', 'POST'])
 def querymainpage():
-        return render_template('querymainpage.html')
-
-
-@app.route('/cluster')
-def cluster_info():
-    cluster = rc.getClusterInformation()
-    return "Cluster Name: %s" % cluster
-
-
-@app.route('/events')
-def events_info():
-    events = rc.getEventsInformation()
-    return "Events %s" % events
+    error = None
+    if request.method == 'POST':
+        investigate_date = request.form['investigate_date']
+        events = rc.getEventsInformation(investigate_date)
+        return json2html.convert(json = events)
+    return render_template('querymainpage.html', error=error)
 
 
 if __name__ == '__main__':

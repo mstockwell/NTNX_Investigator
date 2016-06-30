@@ -2,33 +2,34 @@
 <html>
   <head>
     <title>Nutanix Investigator</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
     <div class="container">
       <center>
           <h1>  Welcome to Nutanix Investigator</h1>
-      <br>
-      <div class="container">
-      <center><h3>Connect to your Nutanix cluster</h3>
-      <form action="" method="post">
-        <input type="text" placeholder="" name="ip_address" value="{{
-          request.form.ip_address }}">
-          <br>
-        <input type="text" placeholder="Username" name="username" value="{{
-          request.form.username }}">
-          <br>
-         <input type="password" placeholder="Password" name="password" value="{{
-          request.form.password }}">
-          <br><br>
-        <input class="btn btn-default" type="submit" value="Login">
-      </form></center>
-      {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }}
-      {% endif %}
-    </div>
+          <h2>  Connect to your Nutanix Cluster</h2>
       </center>
+      <br>
+            <form class="connect" action="" method="post">
+              <label>Cluster IP Address  </label><br><input type="text" size="15" maxlength="15" placeholder="IP Address" name="ip_address" value="{{
+          request.form.ip_address }}">
+                <br>
+              <label>Account Id  </label><br><input type="text" size="30" placeholder="Username" name="username" value="{{
+          request.form.username }}">
+                <br>
+              <label>Password  </label><br><input type="password" size="30" placeholder="Password" name="password" value="{{
+          request.form.password }}">
+                <br>
+              <button class="btn btn-default" type="submit" value="Login">Connect</button>
+            </form>
+          {% if error %}
+        <div class="container">
+          <p class="error"><strong>Error:</strong> {{ error }}
+          {% endif %}
+        </div>
+
     </div>
   </body>
 </html>

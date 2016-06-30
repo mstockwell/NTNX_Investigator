@@ -7,5 +7,19 @@
 </head>
 <body>
 <H1>Welcome to Query Main Page</H1>
+<div class="container">
+            <form action="" method="post">
+              <label>Enter a Date to Investigate  </label><input type="date" placeholder="" name="investigate_date" value="{{
+          request.form.investigate_date }}">
+                <br><br>
+              <input class="btn btn-default" type="submit" value="Investigate">
+            </form>
+          </center>
+          {% if error %}
+        </div>
+        <div class="container">
+          <p class="error"><strong>Error:</strong> {{ error }}
+          {% endif %}
+        </div>
 </body>
 </html>
