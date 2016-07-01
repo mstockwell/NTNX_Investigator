@@ -34,7 +34,12 @@ class RestConnection():
         json_events = json.loads(serverResponse.text)
         print json_events.keys()
         for element in json_events['entities']:
-            print element.get('contextValues')
+            if element.get('alertTypeUuid') == 'LoginInfoAudit':
+                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{audit_user}',element.get('contextValues')[0] )
+                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{ip_address}',element.get('contextValues')[1] )
+                print element.get('contextValues')[-1]
+            else:
+                print element.get('contextValues')[-2]
         return json_events
 
 
