@@ -12,6 +12,7 @@ import time
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 base_url = REST_URL_SUFFIX
 
+# Nutanix Who did What?  Name did Action
 
 class RestConnection():
     def __init__(self):
@@ -33,15 +34,33 @@ class RestConnection():
         serverResponse = self.session.get(eventsURL)
         json_events = json.loads(serverResponse.text)
         print json_events.keys()
+        # list of alertType: ContainerAudit, RemoteSiteAudit, NFSDatastoreAudit, SnapshotReadyAudit,ReplicationSystemStateAudit,ProtectionDomainAudit
+        # ProtectionDomainEntitiesAudit, PdCronScheduleAudit,ModifyProtectionDomainSnapshotAudit, ProtectionDomainChangeModeAudit, RegisterVmAudit
         for element in json_events['entities']:
             if element.get('alertTypeUuid') == 'LoginInfoAudit':
-                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{audit_user}',element.get('contextValues')[0] )
-                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{ip_address}',element.get('contextValues')[1] )
+                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{audit_user}', element.get(
+                    'contextValues')[0])
+                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{ip_address}', element.get(
+                    'contextValues')[1])
                 print element.get('contextValues')[-1]
+            elif element.get('alertTypeUuid') == 'ContainerAudit':
+                if element.get('contextValues')[-2].startswith("Updated"):
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}', element.get(
+                    'contextValues')[1])
+                else:
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}', element.get(
+                    'contextValues')[1])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{storage_pool_name}', element.get(
+                    'contextValues')[3])
+            elif element.get('alertTypeUuid') == 'NFSDatastoreAudit':
+                if element.get('contextValues')[-2].startswith("Creation"):
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{datastore_name}', element.get(
+                    'contextValues')[0])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}', element.get(
+                    'contextValues')[1])
             else:
-                print element.get('contextValues')[-2]
+                print "Some other audit"
         return json_events
-
 
 
 app = Flask(__name__)
@@ -69,7 +88,7 @@ def querymainpage():
     if request.method == 'POST':
         investigate_date = request.form['investigate_date']
         events = rc.getEventsInformation(investigate_date)
-        return json2html.convert(json = events)
+        return json2html.convert(json=events)
     return render_template('querymainpage.html', error=error)
 
 
