@@ -35,37 +35,48 @@ class NTNXEventRESTAPI():
         serverResponse = self.session.get(eventsURL)
         json_events = json.loads(serverResponse.text)
         print json_events.keys()
+
+
         # list of alertType: ContainerAudit, RemoteSiteAudit, NFSDatastoreAudit, SnapshotReadyAudit,ReplicationSystemStateAudit,ProtectionDomainAudit
         # ProtectionDomainEntitiesAudit, PdCronScheduleAudit,ModifyProtectionDomainSnapshotAudit, ProtectionDomainChangeModeAudit, RegisterVmAudit
-        for element in json_events['entities']:
-            if element.get('alertTypeUuid') == 'LoginInfoAudit':
-                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{audit_user}', element.get(
+
+
+        def logininfo ():
+            element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{audit_user}', element.get(
                     'contextValues')[0])
-                element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{ip_address}', element.get(
+            element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{ip_address}', element.get(
                     'contextValues')[1])
-                print element.get('contextValues')[-1]
-            elif element.get('alertTypeUuid') == 'ContainerAudit':
-                if element.get('contextValues')[-2].startswith("Updated"):
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[1])
-                else:
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[1])
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{storage_pool_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[3])
-            elif element.get('alertTypeUuid') == 'NFSDatastoreAudit':
-                if element.get('contextValues')[-2].startswith("Creation"):
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{datastore_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[0])
+
+        def containerinfo ():
+            if element.get('contextValues')[-2].startswith("Updated"):
                     element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
                                                                                                 element.get(
                                                                                                     'contextValues')[1])
             else:
-                print "Some other audit"
+                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[1])
+                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{storage_pool_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[3])
+        def datastoreinfo ():
+            if element.get('contextValues')[-2].startswith("Creation"):
+                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{datastore_name}',
+                                                                                            element.get(
+                                                                                                'contextValues')[0])
+                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
+                                                                                            element.get(
+                                                                                                'contextValues')[1])
+
+        event_types = {
+            'LoginInfoAudit' : logininfo,
+            'ContainerAudit' : containerinfo,
+            'NFSDatastoreAudit': datastoreinfo,
+        }
+
+        for element in json_events['entities']:
+            event_types[element.get('alertTypeUuid')]()
+
         return json_events
 
 
