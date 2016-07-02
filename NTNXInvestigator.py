@@ -77,7 +77,8 @@ class NTNXEventRESTAPI():
             event_user, event_msg = event_types[element.get('alertTypeUuid')]()
             event_list.append((event_user, event_msg))
         for x in event_list: print x
-        return json_events
+        # return json_events
+        return event_list
 
 
 app = Flask(__name__)
@@ -105,14 +106,15 @@ def querymainpage():
     if request.method == 'POST':
         investigate_date = request.form['investigate_date']
         events = event_api_connection.getEventsInformation(investigate_date)
-        return json2html.convert(json=events)
+        return render_template('results.html', num_events=len(events),events_list=events, investigate_date=investigate_date)
+        # return json2html.convert(json=events)
     return render_template('querymainpage.html', error=error)
 
 
 if __name__ == '__main__':
     try:
         event_api_connection = NTNXEventRESTAPI()
-        app.run()
+        app.run(debug=True)
     except Exception as ex:
         print ex
         sys.exit(1)
