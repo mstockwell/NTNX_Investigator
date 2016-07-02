@@ -1,21 +1,41 @@
 body {
-  background: lightgreen;
+  background: #f2f2f2;
 }
 
 .wrapper {
   margin-top: 80px;
   margin-bottom: 80px;
 }
-
-.connect {
-  max-width: 380px;
-  padding: 15px 35px 45px;
+.button {
+    background-color: #1aa3ff;
+    color: #FFF;
+    font-size: 20px;
+    float: center;
+    padding: 0px;
+    border-radius: 10px;
+    text-align: center;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.big-btn {
+    width: 190px;
+    height: 40px;
+}
+.form-signin {
+  max-width: 210px;
+  padding: 5px 35px 35px;
   margin: 0 auto;
-  background-color: lightblue;
+  background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
-
-.connect {
+.form-signin .form-signin-heading,
+.form-signin {
+  margin-bottom: 30px;
+}
+.form-signin {
+  font-weight: normal;
+}
+.form-signin .form-control {
   position: relative;
   font-size: 16px;
   height: auto;
@@ -24,15 +44,15 @@ body {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.connect:focus {
+.form-signin .form-control:focus {
   z-index: 2;
 }
-.connect input[type="text"] {
+.form-signin input[type="text"] {
   margin-bottom: -1px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
-.connect input[type="password"] {
+.form-signin input[type="password"] {
   margin-bottom: 20px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;

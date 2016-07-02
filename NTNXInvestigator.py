@@ -1,5 +1,5 @@
 from flask import Flask, request, g, redirect, url_for, \
-    abort, session, render_template, flash
+     session, render_template, flash
 
 from json2html import *
 
@@ -12,9 +12,10 @@ import time
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 base_url = REST_URL_SUFFIX
 
+
 # Nutanix Who did What?  Name did Action
 
-class RestConnection():
+class NTNXEventRESTAPI():
     def __init__(self):
         self.session = requests.Session()
 
@@ -45,19 +46,24 @@ class RestConnection():
                 print element.get('contextValues')[-1]
             elif element.get('alertTypeUuid') == 'ContainerAudit':
                 if element.get('contextValues')[-2].startswith("Updated"):
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}', element.get(
-                    'contextValues')[1])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[1])
                 else:
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}', element.get(
-                    'contextValues')[1])
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{storage_pool_name}', element.get(
-                    'contextValues')[3])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[1])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{storage_pool_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[3])
             elif element.get('alertTypeUuid') == 'NFSDatastoreAudit':
                 if element.get('contextValues')[-2].startswith("Creation"):
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{datastore_name}', element.get(
-                    'contextValues')[0])
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}', element.get(
-                    'contextValues')[1])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{datastore_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[0])
+                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
+                                                                                                element.get(
+                                                                                                    'contextValues')[1])
             else:
                 print "Some other audit"
         return json_events
@@ -77,7 +83,7 @@ def HomePage():
         password = request.form['password']
         global base_url
         base_url = REST_URL_SUFFIX%ip_address
-        rc.create_connection(username, password)
+        event_api_connection.create_connection(username, password)
         return redirect(url_for('querymainpage'))
     return render_template('homepage.html', error=error)
 
@@ -87,14 +93,14 @@ def querymainpage():
     error = None
     if request.method == 'POST':
         investigate_date = request.form['investigate_date']
-        events = rc.getEventsInformation(investigate_date)
+        events = event_api_connection.getEventsInformation(investigate_date)
         return json2html.convert(json=events)
     return render_template('querymainpage.html', error=error)
 
 
 if __name__ == '__main__':
     try:
-        rc = RestConnection()
+        event_api_connection = NTNXEventRESTAPI()
         app.run()
     except Exception as ex:
         print ex

@@ -1,35 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Nutanix Investigator</title>
+    <title>Nutanix WdW</title>
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <div class="container">
+    <div class="wrapper">
       <center>
-          <h1>  Welcome to Nutanix Investigator</h1>
-          <h2>  Connect to your Nutanix Cluster</h2>
+          <h1>  Who did What?</h1>
       </center>
-      <br>
-            <form class="connect" action="" method="post">
-              <label>Cluster IP Address  </label><br><input type="text" size="15" maxlength="15" placeholder="IP Address" name="ip_address" value="{{
+            <form class="form-signin" action="" method="post">
+                <h2>Connect to Nutanix</h2>
+              <input type="text" class="form-control" placeholder="Cluster IP address" name="ip_address" value="{{
           request.form.ip_address }}">
-                <br>
-              <label>Account Id  </label><br><input type="text" size="30" placeholder="Username" name="username" value="{{
+              <input type="text" class="form-control" placeholder="Username" name="username" value="{{
           request.form.username }}">
-                <br>
-              <label>Password  </label><br><input type="password" size="30" placeholder="Password" name="password" value="{{
+              <input type="password" class="form-control" placeholder="Password" name="password" value="{{
           request.form.password }}">
-                <br>
-              <button class="btn btn-default" type="submit" value="Login">Connect</button>
+              <button class="button big-btn" type="submit" value="Login">Connect</button>
             </form>
           {% if error %}
-        <div class="container">
+        <div class="wrapper">
           <p class="error"><strong>Error:</strong> {{ error }}
           {% endif %}
         </div>
-
     </div>
   </body>
 </html>
