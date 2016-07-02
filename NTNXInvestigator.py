@@ -12,6 +12,7 @@ import time
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 base_url = REST_URL_SUFFIX
 
+
 class NTNXEventRESTAPI():
     def __init__(self):
         self.session = requests.Session()
@@ -45,32 +46,27 @@ class NTNXEventRESTAPI():
             return user_info, event_info
 
         def container_event():
-            user_info = element.get('contextValues')[0]
-            event_info = element.get('contextValues')[-2].replace('{container_name}',element.get('contextValues')[1])
+            user_info = element.get('contextValues')[-1]
+            event_info = element.get('contextValues')[-2].replace('{container_name}', element.get('contextValues')[1])
             if event_info.startswith("Added"):
-                event_info = event_info.replace('{storage_pool_name}',element.get('contextValues')[3])
+                event_info = event_info.replace('{storage_pool_name}', element.get('contextValues')[3])
             return user_info, event_info
 
-        def datastore_event():
-            user_info = element.get('contextValues')[0]
+        def nfs_datastore_event():
+            user_info = element.get('contextValues')[-1]
             if element.get('contextValues')[-2].startswith("Creation"):
-                event_info= element.get('contextValues')[-2].replace('{datastore_name}', element.get('contextValues')[0])
+                event_info = element.get('contextValues')[-2].replace('{datastore_name}',
+                                                                      element.get('contextValues')[0])
                 event_info = event_info.replace('{container_name}', element.get('contextValues')[1])
             else:
                 event_info = "datastore update event"
             return user_info, event_info
 
-        def nfs_datastore_event():
-            user_info = element.get('contextValues')[0]
-            event_info = "datastore update event"
-            return user_info, event_info
-
-        event_types =  {
+        event_types = {
             'LoginInfoAudit': login_event,
-            'ContainerAudit' : container_event,
-            'DataStoreAudit' : datastore_event,
-            'NFSDatastoreAudit' : nfs_datastore_event,
-            }
+            'ContainerAudit': container_event,
+            'NFSDatastoreAudit': nfs_datastore_event,
+        }
 
         eventsURL = create_event_rest_url(investigate_date)
         serverResponse = self.session.get(eventsURL)
