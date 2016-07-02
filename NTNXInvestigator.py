@@ -1,5 +1,5 @@
 from flask import Flask, request, g, redirect, url_for, \
-     session, render_template, flash
+    session, render_template
 
 from json2html import *
 
@@ -11,9 +11,6 @@ import time
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 base_url = REST_URL_SUFFIX
-
-
-# Nutanix Who did What?  Name did Action
 
 class NTNXEventRESTAPI():
     def __init__(self):
@@ -27,56 +24,63 @@ class NTNXEventRESTAPI():
         return session
 
     def getEventsInformation(self, investigate_date):
-        start_time = time.mktime(datetime.datetime.strptime(investigate_date, "%Y-%m-%d").timetuple())
-        end_time = start_time + (24*60*60)
-        start_time_url = str(int(start_time)) + "000000"
-        end_time_url = str(int(end_time)) + "000000"
-        eventsURL = base_url + "/events?" + "startTimeInUsecs=" + start_time_url + "&endTimeInUsecs=" + end_time_url
-        serverResponse = self.session.get(eventsURL)
-        json_events = json.loads(serverResponse.text)
-        print json_events.keys()
 
-
-        # list of alertType: ContainerAudit, RemoteSiteAudit, NFSDatastoreAudit, SnapshotReadyAudit,ReplicationSystemStateAudit,ProtectionDomainAudit
+        # RemoteSiteAudit, SnapshotReadyAudit,ReplicationSystemStateAudit,ProtectionDomainAudit
         # ProtectionDomainEntitiesAudit, PdCronScheduleAudit,ModifyProtectionDomainSnapshotAudit, ProtectionDomainChangeModeAudit, RegisterVmAudit
 
+        def create_event_rest_url(date):
+            start_time = time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())
+            end_time = start_time + (24*60*60)
+            start_time_url = str(int(start_time)) + "000000"
+            end_time_url = str(int(end_time)) + "000000"
+            url = base_url + "/events?" + "startTimeInUsecs=" + start_time_url + "&endTimeInUsecs=" + end_time_url
+            return url
 
-        def logininfo ():
-            element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{audit_user}', element.get(
-                    'contextValues')[0])
-            element.get('contextValues')[-1] = element.get('contextValues')[-1].replace('{ip_address}', element.get(
-                    'contextValues')[1])
+        def login_event():
+            user_info = element.get('contextValues')[0]
+            event_info = element.get('contextValues')[-1].replace('{audit_user}', element.get(
+                'contextValues')[0])
+            event_info = event_info.replace('{ip_address}', element.get(
+                'contextValues')[1])
+            return user_info, event_info
 
-        def containerinfo ():
-            if element.get('contextValues')[-2].startswith("Updated"):
-                    element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[1])
-            else:
-                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[1])
-                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{storage_pool_name}',
-                                                                                                element.get(
-                                                                                                    'contextValues')[3])
-        def datastoreinfo ():
+        def container_event():
+            user_info = element.get('contextValues')[0]
+            event_info = element.get('contextValues')[-2].replace('{container_name}',element.get('contextValues')[1])
+            if event_info.startswith("Added"):
+                event_info = event_info.replace('{storage_pool_name}',element.get('contextValues')[3])
+            return user_info, event_info
+
+        def datastore_event():
+            user_info = element.get('contextValues')[0]
             if element.get('contextValues')[-2].startswith("Creation"):
-                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{datastore_name}',
-                                                                                            element.get(
-                                                                                                'contextValues')[0])
-                element.get('contextValues')[-2] = element.get('contextValues')[-2].replace('{container_name}',
-                                                                                            element.get(
-                                                                                                'contextValues')[1])
+                event_info= element.get('contextValues')[-2].replace('{datastore_name}', element.get('contextValues')[0])
+                event_info = event_info.replace('{container_name}', element.get('contextValues')[1])
+            else:
+                event_info = "datastore update event"
+            return user_info, event_info
 
-        event_types = {
-            'LoginInfoAudit' : logininfo,
-            'ContainerAudit' : containerinfo,
-            'NFSDatastoreAudit': datastoreinfo,
-        }
+        def nfs_datastore_event():
+            user_info = element.get('contextValues')[0]
+            event_info = "datastore update event"
+            return user_info, event_info
 
+        event_types =  {
+            'LoginInfoAudit': login_event,
+            'ContainerAudit' : container_event,
+            'DataStoreAudit' : datastore_event,
+            'NFSDatastoreAudit' : nfs_datastore_event,
+            }
+
+        eventsURL = create_event_rest_url(investigate_date)
+        serverResponse = self.session.get(eventsURL)
+        json_events = json.loads(serverResponse.text)
+        event_list = []
         for element in json_events['entities']:
-            event_types[element.get('alertTypeUuid')]()
-
+            # print element.get('alertTypeUuid')
+            event_user, event_msg = event_types[element.get('alertTypeUuid')]()
+            event_list.append((event_user, event_msg))
+        for x in event_list: print x
         return json_events
 
 
