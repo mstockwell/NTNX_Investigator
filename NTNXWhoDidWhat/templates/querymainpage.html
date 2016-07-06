@@ -3,23 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Query Main Page</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
-<H1>Welcome to Query Main Page</H1>
+<H1>See what activites have occured on the Nutanix cluster  {{ cluster_name }}  for a specific date</H1>
 <div class="container">
             <form action="" method="post">
-              <label>Enter a Date to Investigate  </label><input type="date" placeholder="" name="investigate_date" value="{{
-          request.form.investigate_date }}">
+              <label>Date</label><input type="date" placeholder="" name="investigate_date" value="{{request.form.investigate_date}}">
                 <br><br>
               <input class="btn btn-default" type="submit" value="Investigate">
             </form>
-          </center>
           {% if error %}
-        </div>
-        <div class="container">
+        <div class="wrapper">
           <p class="error"><strong>Error:</strong> {{ error }}
           {% endif %}
         </div>
-</body>
+    </div>
+  </body>
 </html>
