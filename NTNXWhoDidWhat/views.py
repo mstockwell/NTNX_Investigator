@@ -1,5 +1,5 @@
 from NTNXWhoDidWhat import app
-from NTNXInvestigator import test_credentials, get_events_data
+from WdWController import test_credentials, get_events_data
 from flask import request, render_template, redirect, url_for
 
 
