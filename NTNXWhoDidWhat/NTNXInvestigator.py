@@ -98,6 +98,9 @@ def get_events_data(investigate_date):
     def protect_domain_entities_event():
         return "user_info", "protect_domain_entities_event"
 
+    def pd_OOB_sched_event():
+        return "user_info", "pd_OOB_sched_event"
+
     event_types = {
         'LoginInfoAudit': login_event,
         'ContainerAudit': container_event,
@@ -115,6 +118,7 @@ def get_events_data(investigate_date):
         'UpgradeInfoAudit' : upgrade_info_event,
         'SoftwareReleaseAudit': software_release_event,
         'NFSWhiteListAudit': nfs_whitelist_event,
+        'PdOOBScheduleAudit': pd_OOB_sched_event,
     }
 
     print "create events URL"

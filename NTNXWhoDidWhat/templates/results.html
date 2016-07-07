@@ -1,8 +1,12 @@
 <!DOCTYPE html>
+<html lang="en">
 <title>Events</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
+<body>
 <div class=page>
+  <center>
   <h1>{{ num_events }} Events from {{ investigate_date }}</h1>
+    <a href="{{ url_for('querymainpage') }}">Select another date...</a>
 <table>
   <thead>
     <th>User Account</th>
@@ -17,4 +21,8 @@
 {% endfor %}
   </tbody>
 </table>
+    <a href="{{ url_for('querymainpage') }}">Select another date...</a>
 </div>
+</center>
+</body>
+</html>
