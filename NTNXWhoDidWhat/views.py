@@ -12,7 +12,6 @@ def HomePage():
         password = request.form['password']
         status, cluster_info = test_credentials(username, password, ip_address)
         if status == 200:
-            print cluster_info.get("name")
             return redirect(url_for('querymainpage', cluster_name=cluster_info.get('name')))
         else:
             print "Nutant, we have a problem!"
@@ -29,5 +28,4 @@ def querymainpage():
                                investigate_date=investigate_date)
     else:
         cluster_name = request.args.get('cluster_name')
-        print cluster_name
         return render_template('querymainpage.html', cluster_name=cluster_name, error=error)

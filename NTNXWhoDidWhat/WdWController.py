@@ -1,9 +1,10 @@
 from flask import session
 import requests
-import sys
 import datetime
 import time
-import json
+# import json
+from json2html import *
+
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 my_session = requests.Session()
@@ -31,7 +32,6 @@ def get_events_data(investigate_date):
         end_time_url = str(int(end_time)) + "000000"
         base_url = REST_URL_SUFFIX%session['ip_address']
         url = base_url + "/events?" + "startTimeInUsecs=" + start_time_url + "&endTimeInUsecs=" + end_time_url
-        print url
         return url
 
     def login_event():
@@ -60,16 +60,42 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def rep_sys_state_event():
-        return "user info", "rep_sys_state_audit_event"
+        user_info = "<System Triggered>"
+        event_info = element.get('contextValues')[-1].replace('{snapshot_id}', element.get(
+            'contextValues')[2])
+        event_info = event_info.replace('{protection_domain_name}', element.get(
+            'contextValues')[0])
+        event_info = event_info.replace('{remote_name}', element.get(
+            'contextValues')[1])
+        event_info = event_info.replace('{start_time}', element.get(
+            'contextValues')[3])
+        return user_info, event_info
 
     def snap_ready_event():
-        return "user info", "snap_ready_event"
+        user_info = "<System Triggered>"
+        event_info = element.get('contextValues')[-1].replace('{snapshot_id}', element.get(
+            'contextValues')[1])
+        event_info = event_info.replace('{protection_domain_name}', element.get(
+            'contextValues')[0])
+        return user_info, event_info
 
     def remote_site_event():
         return "user info", "remote_site_event"
 
     def protection_domain_event():
-        return "user info", "protection_domain_event"
+        user_info = element.get('contextValues')[-1]
+        if element.get('contextValues')[1] == "add":
+            event_info = element.get('contextValues')[2].replace('{protection_domain_name}',
+                                                                  element.get('contextValues')[0])
+            return user_info, event_info
+        else:
+            return "user info", "protection_domain_event"
+
+    def protect_domain_entities_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[1].replace('{protection_domain_name}',
+                                                                  element.get('contextValues')[0])
+        return user_info, event_info
 
     def register_vm_event():
         return "user info", "Register_vm_event"
@@ -84,7 +110,10 @@ def get_events_data(investigate_date):
         return "user info", "protect_domain_change_mode_event"
 
     def pd_cron_sched_event():
-        return "user info", "pd_cron_sched_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[2].replace('{cron_schedule_id_list}', element.get('contextValues')[1])
+        event_info = event_info.replace('{protection_domain_name}', element.get('contextValues')[0])
+        return user_info, event_info
 
     def upgrade_info_event():
         return "user info", "upgrade_info_event"
@@ -94,9 +123,6 @@ def get_events_data(investigate_date):
 
     def nfs_whitelist_event():
         return "user_info", "nfs_whitelist_event"
-
-    def protect_domain_entities_event():
-        return "user_info", "protect_domain_entities_event"
 
     def pd_OOB_sched_event():
         return "user_info", "pd_OOB_sched_event"
@@ -121,15 +147,14 @@ def get_events_data(investigate_date):
         'PdOOBScheduleAudit': pd_OOB_sched_event,
     }
 
-    print "create events URL"
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
+    # print json2html.convert(json = json_events)
     event_list = []
     for element in json_events['entities']:
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()
         event_list.append((event_user, event_msg))
-    for x in event_list: print x
     return event_list
 
 
