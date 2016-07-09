@@ -8,13 +8,14 @@
   <body>
     <div class="wrapper">
       <center>
-          <h1>We Got an Error</h1>
+          <h1>Sorry Nutant, We Got an Error</h1>
       </center>
      {% block body %}
 
 <p>{{ error }}</p>
 
 {% endblock %}
+            <a href="{{ url_for('homepage') }}">Try Connecting Again...</a>
     </div>
   </body>
 </html>

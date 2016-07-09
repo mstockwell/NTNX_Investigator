@@ -4,7 +4,7 @@ from flask import request, render_template, redirect, url_for
 
 
 @app.route('/', methods=['GET', 'POST'])
-def HomePage():
+def homepage():
     error = None
     if request.method == 'POST':
         ip_address = request.form['ip_address']
@@ -15,7 +15,7 @@ def HomePage():
             if status == 200:
                 return redirect(url_for('querymainpage', cluster_name=cluster_info.get('name')))
             else:
-                return "We've got a problem, Status code: %s" % status
+                return render_template("error.html", error=status)
         except Exception as e:
                 return render_template("error.html", error=str(e))
     return render_template('homepage.html', error=error)
