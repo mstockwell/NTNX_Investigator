@@ -1,7 +1,6 @@
 from NTNXWhoDidWhat import app
 from WdWController import test_credentials, get_events_data
 from flask import request, render_template, redirect, url_for, session
-import time
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -28,9 +27,12 @@ def querymainpage():
     error = None
     if request.method == 'POST':
         investigate_date = request.form['investigate_date']
-        events = get_events_data(investigate_date)
-        return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events), events_list=events,
+        if investigate_date != "":
+            events = get_events_data(investigate_date)
+            return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events), events_list=events,
                                investigate_date=investigate_date)
+        else:
+            error="You must enter a valid date to seach"
+            return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)
     else:
-        return render_template('querymainpage.html', current_date=time.strftime("%m/%d/%Y"),
-                               cluster_name=session["cluster_name"], error=error)
+        return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)
