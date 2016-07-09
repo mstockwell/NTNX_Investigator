@@ -12,7 +12,7 @@ def HomePage():
         password = request.form['password']
         try:
             status, cluster_info = test_credentials(username, password, ip_address)
-            if status == "200":
+            if status == 200:
                 return redirect(url_for('querymainpage', cluster_name=cluster_info.get('name')))
             else:
                 return "We've got a problem, Status code: %s" % status

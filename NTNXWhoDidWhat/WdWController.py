@@ -2,7 +2,7 @@ from flask import session
 import requests
 import datetime
 import time
-
+import json
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 my_session = requests.Session()
