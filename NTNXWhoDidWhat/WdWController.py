@@ -2,8 +2,6 @@ from flask import session
 import requests
 import datetime
 import time
-# import json
-from json2html import *
 
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
@@ -16,11 +14,8 @@ def test_credentials(username, password, ip_address):
     my_session.auth = (username, password)
     my_session.verify = False
     my_session.headers.update({'Content-Type': 'application/json; charset=utf-8'})
-    try:
-        serverResponse = my_session.get(base_url + "/cluster", timeout=20)
-        return serverResponse.status_code, json.loads(serverResponse.text)
-    except Exception as ex:
-        print "Nutant, we have a problem! %s" % ex
+    serverResponse = my_session.get(base_url + "/cluster", timeout=20)
+    return serverResponse.status_code, json.loads(serverResponse.text)
 
 
 def get_events_data(investigate_date):
@@ -150,7 +145,6 @@ def get_events_data(investigate_date):
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
-    # print json2html.convert(json = json_events)
     event_list = []
     for element in json_events['entities']:
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()

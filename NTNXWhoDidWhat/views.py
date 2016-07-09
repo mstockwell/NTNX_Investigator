@@ -10,11 +10,14 @@ def HomePage():
         ip_address = request.form['ip_address']
         username = request.form['username']
         password = request.form['password']
-        status, cluster_info = test_credentials(username, password, ip_address)
-        if status == 200:
-            return redirect(url_for('querymainpage', cluster_name=cluster_info.get('name')))
-        else:
-            print "Nutant, we have a problem!"
+        try:
+            status, cluster_info = test_credentials(username, password, ip_address)
+            if status == "200":
+                return redirect(url_for('querymainpage', cluster_name=cluster_info.get('name')))
+            else:
+                return "We've got a problem, Status code: %s" % status
+        except Exception as e:
+                return render_template("error.html", error=str(e))
     return render_template('homepage.html', error=error)
 
 

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nutanix WdW</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="wrapper">
+      <center>
+          <h1>We Got an Error</h1>
+      </center>
+     {% block body %}
+
+<p>{{ error }}</p>
+
+{% endblock %}
+    </div>
+  </body>
+</html>
