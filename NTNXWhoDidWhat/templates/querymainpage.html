@@ -11,7 +11,7 @@
     <div class="wrapper">
         <H1>View activites on Nutanix cluster {{ cluster_name }}</H1>
         <form class="form-query" action="" method="post">
-            <input class="form-control" type="date" placeholder="Date" name="investigate_date" value="{{request.form.investigate_date}}">
+            <input class="form-control" style="font-size: 1.5rem" type="date" placeholder="Date" name="investigate_date" value="{{request.form.investigate_date}}">
             <br><br>
             <input class="button big-btn" type="submit" value="Search">
         </form>
@@ -20,6 +20,7 @@
         <p class="error"><strong>Error:</strong> {{ error }}
             {% endif %}
     </div>
+        <a href="{{ url_for('homepage') }}">Or connect to a different Nutanix Cluster...</a>
     </div>
     </center>
   </body>

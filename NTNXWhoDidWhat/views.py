@@ -1,6 +1,7 @@
 from NTNXWhoDidWhat import app
 from WdWController import test_credentials, get_events_data
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, session
+import time
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -12,8 +13,9 @@ def homepage():
         password = request.form['password']
         try:
             status, cluster_info = test_credentials(username, password, ip_address)
+            session["cluster_name"] = cluster_info.get('name')
             if status == 200:
-                return redirect(url_for('querymainpage', cluster_name=cluster_info.get('name')))
+                return redirect(url_for('querymainpage', cluster_name=session["cluster_name"]))
             else:
                 return render_template("error.html", error=status)
         except Exception as e:
@@ -27,8 +29,8 @@ def querymainpage():
     if request.method == 'POST':
         investigate_date = request.form['investigate_date']
         events = get_events_data(investigate_date)
-        return render_template('results.html', num_events=len(events), events_list=events,
+        return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events), events_list=events,
                                investigate_date=investigate_date)
     else:
-        cluster_name = request.args.get('cluster_name')
-        return render_template('querymainpage.html', cluster_name=cluster_name, error=error)
+        return render_template('querymainpage.html', current_date=time.strftime("%m/%d/%Y"),
+                               cluster_name=session["cluster_name"], error=error)
