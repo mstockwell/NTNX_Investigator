@@ -3,6 +3,7 @@ import requests
 import datetime
 import time
 import json
+from json2html import *
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 my_session = requests.Session()
@@ -79,12 +80,9 @@ def get_events_data(investigate_date):
 
     def protection_domain_event():
         user_info = element.get('contextValues')[-1]
-        if element.get('contextValues')[1] == "add":
-            event_info = element.get('contextValues')[2].replace('{protection_domain_name}',
+        event_info = element.get('contextValues')[2].replace('{protection_domain_name}',
                                                                   element.get('contextValues')[0])
-            return user_info, event_info
-        else:
-            return "user info", "protection_domain_event"
+        return user_info, event_info
 
     def protect_domain_entities_event():
         user_info = element.get('contextValues')[-1]
@@ -96,10 +94,13 @@ def get_events_data(investigate_date):
         return "user info", "Register_vm_event"
 
     def restore_proctect_domain_vms_event():
-        return "user info", "restore_protect_domain_vms_event"
+        user_info = element.get('contextValues')[-1]
+        return user_info, "restore_protect_domain_vms_event"
 
     def mod_protect_domain_snap_event():
-        return "user info", "mod_protect_domain_snap_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[-2]
+        return user_info, event_info
 
     def protect_domain_change_mode_event():
         return "user info", "protect_domain_change_mode_event"
@@ -145,6 +146,7 @@ def get_events_data(investigate_date):
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
+    print json2html.convert(json = json_events)
     event_list = []
     for element in json_events['entities']:
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()

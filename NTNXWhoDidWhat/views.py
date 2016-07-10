@@ -18,7 +18,7 @@ def homepage():
             else:
                 return render_template("error.html", error=status)
         except Exception as e:
-                return render_template("error.html", error=str(e))
+            return render_template("error.html", error=str(e))
     return render_template('homepage.html', error=error)
 
 
@@ -29,10 +29,11 @@ def querymainpage():
         investigate_date = request.form['investigate_date']
         if investigate_date != "":
             events = get_events_data(investigate_date)
-            return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events), events_list=events,
-                               investigate_date=investigate_date)
+            return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events),
+                                   events_list=events,
+                                   investigate_date=investigate_date)
         else:
-            error="You must enter a valid date to seach"
+            error = "You must enter a valid date to seach"
             return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)
     else:
         return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)
