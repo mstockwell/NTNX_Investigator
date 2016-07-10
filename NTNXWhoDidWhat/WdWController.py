@@ -20,7 +20,6 @@ def test_credentials(username, password, ip_address):
 
 
 def get_events_data(investigate_date):
-
     def create_event_rest_url(date):
         start_time = time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())
         end_time = start_time + (24*60*60)
@@ -56,7 +55,7 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def rep_sys_state_event():
-        user_info = "<System Triggered>"
+        user_info = "< System Generated >"
         event_info = element.get('contextValues')[-1].replace('{snapshot_id}', element.get(
             'contextValues')[2])
         event_info = event_info.replace('{protection_domain_name}', element.get(
@@ -68,7 +67,7 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def snap_ready_event():
-        user_info = "<System Triggered>"
+        user_info = "< System Generated >"
         event_info = element.get('contextValues')[-1].replace('{snapshot_id}', element.get(
             'contextValues')[1])
         event_info = event_info.replace('{protection_domain_name}', element.get(
@@ -76,22 +75,28 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def remote_site_event():
-        return "user info", "remote_site_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[1].replace('{remote_name}',
+                                                             element.get('contextValues')[0])
+        return user_info, event_info
 
     def protection_domain_event():
         user_info = element.get('contextValues')[-1]
         event_info = element.get('contextValues')[2].replace('{protection_domain_name}',
-                                                                  element.get('contextValues')[0])
+                                                             element.get('contextValues')[0])
         return user_info, event_info
 
     def protect_domain_entities_event():
         user_info = element.get('contextValues')[-1]
         event_info = element.get('contextValues')[1].replace('{protection_domain_name}',
-                                                                  element.get('contextValues')[0])
+                                                             element.get('contextValues')[0])
         return user_info, event_info
 
     def register_vm_event():
-        return "user info", "Register_vm_event"
+        user_info = "< System Generated >"
+        event_info = element.get('contextValues')[1].replace('{vm_name}',
+                                                             element.get('contextValues')[0])
+        return user_info, event_info
 
     def restore_proctect_domain_vms_event():
         user_info = element.get('contextValues')[-1]
@@ -103,7 +108,12 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def protect_domain_change_mode_event():
-        return "user info", "protect_domain_change_mode_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[-2].replace('{protection_domain_name}', element.get(
+            'contextValues')[0])
+        event_info = event_info.replace('{desired_mode}', element.get(
+            'contextValues')[2])
+        return user_info, event_info
 
     def pd_cron_sched_event():
         user_info = element.get('contextValues')[-1]
@@ -129,15 +139,15 @@ def get_events_data(investigate_date):
         'NFSDatastoreAudit': nfs_datastore_event,
         'ReplicationSystemStateAudit': rep_sys_state_event,
         'SnapshotReadyAudit': snap_ready_event,
-        'RemoteSiteAudit' : remote_site_event,
+        'RemoteSiteAudit': remote_site_event,
         'RegisterVmAudit': register_vm_event,
-        'RestoreProtectionDomainVMsAudit' : restore_proctect_domain_vms_event,
-        'ProtectionDomainAudit' : protection_domain_event,
-        'ProtectionDomainChangeModeAudit' : protect_domain_change_mode_event,
+        'RestoreProtectionDomainVMsAudit': restore_proctect_domain_vms_event,
+        'ProtectionDomainAudit': protection_domain_event,
+        'ProtectionDomainChangeModeAudit': protect_domain_change_mode_event,
         'ProtectionDomainEntitiesAudit': protect_domain_entities_event,
         'ModifyProtectionDomainSnapshotAudit': mod_protect_domain_snap_event,
-        'PdCronScheduleAudit' : pd_cron_sched_event,
-        'UpgradeInfoAudit' : upgrade_info_event,
+        'PdCronScheduleAudit': pd_cron_sched_event,
+        'UpgradeInfoAudit': upgrade_info_event,
         'SoftwareReleaseAudit': software_release_event,
         'NFSWhiteListAudit': nfs_whitelist_event,
         'PdOOBScheduleAudit': pd_OOB_sched_event,
@@ -146,7 +156,7 @@ def get_events_data(investigate_date):
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
-    print json2html.convert(json = json_events)
+    print json2html.convert(json=json_events)
     event_list = []
     for element in json_events['entities']:
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()
