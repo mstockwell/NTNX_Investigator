@@ -133,10 +133,13 @@ def get_events_data(investigate_date):
     def pd_OOB_sched_event():
         return "user_info", "pd_OOB_sched_event"
 
+    def disk_event():
+        return "user_info", "disk_event"
     event_types = {
         'LoginInfoAudit': login_event,
         'ContainerAudit': container_event,
         'NFSDatastoreAudit': nfs_datastore_event,
+        'DiskAudit': disk_event,
         'ReplicationSystemStateAudit': rep_sys_state_event,
         'SnapshotReadyAudit': snap_ready_event,
         'RemoteSiteAudit': remote_site_event,
@@ -159,6 +162,7 @@ def get_events_data(investigate_date):
     print json2html.convert(json=json_events)
     event_list = []
     for element in json_events['entities']:
+        print "Alert type = %s" % element.get('alertTypeUuid')
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()
         event_list.append((event_user, event_msg))
     return event_list
