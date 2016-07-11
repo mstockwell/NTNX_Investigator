@@ -148,7 +148,9 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def pulse_event():
-        return "user_info", "pulse_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
 
     def remote_support_event():
         user_info = element.get('contextValues')[-1]
@@ -176,6 +178,18 @@ def get_events_data(investigate_date):
         event_info = element.get('contextValues')[-1].replace('{file_server_name}', element.get('contextValues')[1])
         return user_info, event_info
 
+    def password_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[1].replace('{username}', element.get('contextValues')[0])
+        return user_info, event_info
+
+    def directory_role_mapping_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[-2].replace('{role_name}', element.get('contextValues')[1])
+        event_info = event_info.replace('{entity_type}', element.get('contextValues')[2])
+        event_info = event_info.replace('{directory_name}', element.get('contextValues')[0])
+        return user_info, event_info
+
     event_types = {
         'LoginInfoAudit': login_event,
         'ContainerAudit': container_event,
@@ -201,6 +215,8 @@ def get_events_data(investigate_date):
         'ClusterParamsAudit': cluster_params_event,
         'HealthCheckPluginAudit': health_check_plugin_event,
         'FileServerAudit': file_server_event,
+        'PasswordAudit': password_event,
+        'DirectoryRoleMappingAudit': directory_role_mapping_event,
     }
 
     eventsURL = create_event_rest_url(investigate_date)
