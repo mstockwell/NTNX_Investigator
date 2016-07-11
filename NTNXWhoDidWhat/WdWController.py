@@ -122,22 +122,59 @@ def get_events_data(investigate_date):
         return user_info, event_info
 
     def upgrade_info_event():
-        return "user info", "upgrade_info_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[1].replace('{protection_domain_name}', element.get('contextValues')[0])
+        return user_info, event_info
 
     def software_release_event():
-        return "user_info", "upgrade_info_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[2].replace('{software_type}', element.get('contextValues')[1])
+        event_info = event_info.replace('{software_name}', element.get('contextValues')[0])
+        return user_info, event_info
 
     def nfs_whitelist_event():
-        return "user_info", "nfs_whitelist_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
 
     def pd_OOB_sched_event():
-        return "user_info", "pd_OOB_sched_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
 
     def disk_event():
-        return "user_info", "disk_event"
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[1].replace('{disk_uuid}', element.get('contextValues')[0])
+        return user_info, event_info
 
     def pulse_event():
         return "user_info", "pulse_event"
+
+    def remote_support_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
+
+    def snmp_info_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
+
+
+    def cluster_params_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
+
+    def health_check_plugin_event():
+        user_info = element.get('contextValues')[-1]
+        event_info = element.get('contextValues')[0]
+        return user_info, event_info
+
+    def file_server_event():
+        user_info = "< System Generated >"
+        event_info = element.get('contextValues')[-1].replace('{file_server_name}', element.get('contextValues')[1])
+        return user_info, event_info
 
     event_types = {
         'LoginInfoAudit': login_event,
@@ -159,17 +196,23 @@ def get_events_data(investigate_date):
         'NFSWhiteListAudit': nfs_whitelist_event,
         'PdOOBScheduleAudit': pd_OOB_sched_event,
         'PulseAudit': pulse_event,
+        'RemoteSupportAudit' : remote_support_event,
+        'SnmpInfoAudit': snmp_info_event,
+        'ClusterParamsAudit': cluster_params_event,
+        'HealthCheckPluginAudit': health_check_plugin_event,
+        'FileServerAudit': file_server_event,
     }
 
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
-    # print json2html.convert(json=json_events)
+    print json2html.convert(json=json_events)
     event_list = []
     for element in json_events['entities']:
         event_time = time.gmtime(element.get('createdTimeStampInUsecs')/1000000)
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()
         event_list.append((event_user, event_msg,time.strftime('%H:%M:%S', event_time)))
+    event_list.sort(key=lambda tup: tup[2])
     return event_list
 
 

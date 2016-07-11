@@ -28,6 +28,7 @@ def querymainpage():
     if request.method == 'POST':
         investigate_date = request.form['investigate_date']
         if investigate_date != "":
+            # Need to try and catch connection exception with this call
             events = get_events_data(investigate_date)
             return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events),
                                    events_list=events,
