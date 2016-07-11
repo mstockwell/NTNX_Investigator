@@ -10,14 +10,16 @@
       {% if num_events != 0 %}
 <table>
   <thead>
-    <th>User Account</th>
+    <th>Account Id</th>
     <th>Logged Event</th>
+    <th>Time of Event</th>
   </thead>
   <tbody>
 {% for row in events_list %}
     <tr>
       <td>{{ row[0] }}</td>
       <td>{{ row[1] }}</td>
+      <td>{{ row[2] }}</td>
     </tr>
 {% endfor %}
   </tbody>

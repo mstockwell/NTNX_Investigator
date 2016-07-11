@@ -135,6 +135,10 @@ def get_events_data(investigate_date):
 
     def disk_event():
         return "user_info", "disk_event"
+
+    def pulse_event():
+        return "user_info", "pulse_event"
+
     event_types = {
         'LoginInfoAudit': login_event,
         'ContainerAudit': container_event,
@@ -154,17 +158,18 @@ def get_events_data(investigate_date):
         'SoftwareReleaseAudit': software_release_event,
         'NFSWhiteListAudit': nfs_whitelist_event,
         'PdOOBScheduleAudit': pd_OOB_sched_event,
+        'PulseAudit': pulse_event,
     }
 
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
-    print json2html.convert(json=json_events)
+    # print json2html.convert(json=json_events)
     event_list = []
     for element in json_events['entities']:
-        print "Alert type = %s" % element.get('alertTypeUuid')
+        event_time = time.gmtime(element.get('createdTimeStampInUsecs')/1000000)
         event_user, event_msg = event_types[element.get('alertTypeUuid')]()
-        event_list.append((event_user, event_msg))
+        event_list.append((event_user, event_msg,time.strftime('%H:%M:%S', event_time)))
     return event_list
 
 
