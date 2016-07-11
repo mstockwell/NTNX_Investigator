@@ -18,7 +18,6 @@ def test_credentials(username, password, ip_address):
     serverResponse = my_session.get(base_url + "/cluster", timeout=20)
     return serverResponse.status_code, json.loads(serverResponse.text)
 
-
 def get_events_data(investigate_date):
     def create_event_rest_url(date):
         start_time = time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())
