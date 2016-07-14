@@ -7,12 +7,17 @@
   <center>
   <h1>Cluster {{ cluster_name }} has {{ num_events }} Events from {{ investigate_date }}</h1>
     <a href="{{ url_for('querymainpage') }}">Select another date...</a>
+    <br><br>
+        <form class="form-query" action="" method="post">
+          <input class="button" type="submit" name="previous_day" value="<< Previous Day ">
+          <input class="button" type="submit" name="next_day" value="    Next Day >>">
+        </form>
       {% if num_events != 0 %}
 <table>
   <thead>
     <th>Account Id</th>
     <th>Logged Event</th>
-    <th>Time of Event</th>
+    <th><a href="{{ url_for('querymainpage') }}"> Time of Event</a>
   </thead>
   <tbody>
 {% for row in events_list %}

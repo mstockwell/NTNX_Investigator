@@ -221,7 +221,7 @@ def get_events_data(investigate_date):
     eventsURL = create_event_rest_url(investigate_date)
     serverResponse = my_session.get(eventsURL)
     json_events = json.loads(serverResponse.text)
-    print json2html.convert(json=json_events)
+    # print json2html.convert(json=json_events)
     event_list = []
     for element in json_events['entities']:
         event_time = time.gmtime(element.get('createdTimeStampInUsecs')/1000000)
