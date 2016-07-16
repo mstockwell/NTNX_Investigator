@@ -223,6 +223,7 @@ def get_events_data(investigate_date):
     json_events = json.loads(serverResponse.text)
     # print json2html.convert(json=json_events)
     event_list = []
+    unique_accounts = set()
     for element in json_events['entities']:
         event_time = time.gmtime(element.get('createdTimeStampInUsecs')/1000000)
         try:
@@ -231,8 +232,9 @@ def get_events_data(investigate_date):
             event_user = "Unknown"
             event_msg = "An event not captured by Who did What"
         event_list.append((event_user, event_msg,time.strftime('%H:%M:%S', event_time)))
+        unique_accounts.add(event_user)
     event_list.sort(key=lambda tup: tup[2])
-    return event_list
+    return unique_accounts, event_list
 
 
 from NTNXWhoDidWhat import app
