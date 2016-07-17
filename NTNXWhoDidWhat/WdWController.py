@@ -234,7 +234,7 @@ def get_events_data(investigate_date):
         event_list.append((event_user, event_msg,time.strftime('%H:%M:%S', event_time)))
         unique_accounts.add(event_user)
     event_list.sort(key=lambda tup: tup[2])
-    return unique_accounts, event_list
+    return list(unique_accounts), event_list
 
 
 from NTNXWhoDidWhat import app

@@ -30,9 +30,10 @@ def querymainpage():
         session["investigate_date"] = request.form['investigate_date']
         if session["investigate_date"] != "":
             # Need to try and catch connection exception with this call
-            unique_accounts, events = get_events_data(session["investigate_date"])
-            return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(events),
-                                   unique_accounts = unique_accounts, events_list=events,
+            session["unique_accounts"], session["events"] = get_events_data(session["investigate_date"])
+            return render_template('results.html', cluster_name=session["cluster_name"],
+                                   num_events=len(session["events"]),
+                                   unique_accounts=session["unique_accounts"], events_list=session["events"],
                                    investigate_date=session["investigate_date"])
         else:
             error = "You must enter a valid date to search"
@@ -40,3 +41,21 @@ def querymainpage():
     else:
         return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)
 
+
+@app.route('/results', methods=['GET', 'POST'])
+def results():
+    error = None
+    if request.method == 'POST':
+        unique_account = request.form['account_id']
+        unique_events = []
+        if unique_account == "all_accounts":
+            unique_events = session["events"]
+        else:
+            for event in session["events"]:
+                if event[0] == unique_account:
+                    unique_events.append(event)
+        return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(unique_events),
+                               unique_accounts=session["unique_accounts"], events_list=unique_events,
+                               investigate_date=session["investigate_date"])
+    else:
+        return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)

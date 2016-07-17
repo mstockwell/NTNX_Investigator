@@ -8,16 +8,18 @@
   <h1>Cluster {{ cluster_name }} has {{ num_events }} Events from {{ investigate_date }}</h1>
       <a href="{{ url_for('querymainpage') }}">Select a Different Date</a>
       {% if num_events != 0 %}
-      <form name="form-input" action="results.html" method='POST'>
-          <p>
+      <p>
+      <form name="form-input" action="/results" method='POST'>
+
           <select name="account_id">
+              <option value="all_accounts">All Accounts</option>
             {% for item in unique_accounts %}
             <option value="{{ item }}">{{ item }}</option>
             {% endfor %}
             </select>
-              <button type="submit">Filter</button>
+              <button type="submit" value="filter">Filter</button>
       </form>
-            </p>
+      </p>
 <table>
   <thead>
     <th>Account Id</th>
