@@ -1,12 +1,12 @@
 from NTNXWhoDidWhat import app
 from WdWController import test_credentials, get_events_data
 from flask import request, render_template, redirect, url_for, session
-import datetime
 
 
 @app.route('/', methods=['GET', 'POST'])
 def homepage():
     error = None
+    session.clear()
     if request.method == 'POST':
         ip_address = request.form['ip_address']
         username = request.form['username']
@@ -30,10 +30,10 @@ def querymainpage():
         session["investigate_date"] = request.form['investigate_date']
         if session["investigate_date"] != "":
             # Need to try and catch connection exception with this call
-            session["unique_accounts"], session["events"] = get_events_data(session["investigate_date"])
+            session["unique_accounts"], events = get_events_data(session["investigate_date"])
             return render_template('results.html', cluster_name=session["cluster_name"],
-                                   num_events=len(session["events"]),
-                                   unique_accounts=session["unique_accounts"], events_list=session["events"],
+                                   num_events=len(events),
+                                   unique_accounts=session["unique_accounts"], events_list=events,
                                    investigate_date=session["investigate_date"])
         else:
             error = "You must enter a valid date to search"
@@ -46,14 +46,15 @@ def querymainpage():
 def results():
     error = None
     if request.method == 'POST':
+        session["unique_accounts"], events = get_events_data(session["investigate_date"])
         unique_account = request.form['account_id']
         unique_events = []
-        if unique_account == "all_accounts":
-            unique_events = session["events"]
-        else:
-            for event in session["events"]:
+        if unique_account != "all_accounts":
+            for event in events:
                 if event[0] == unique_account:
                     unique_events.append(event)
+        else:
+            unique_events = events
         return render_template('results.html', cluster_name=session["cluster_name"], num_events=len(unique_events),
                                unique_accounts=session["unique_accounts"], events_list=unique_events,
                                investigate_date=session["investigate_date"])

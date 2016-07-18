@@ -218,10 +218,15 @@ def get_events_data(investigate_date):
         'DirectoryRoleMappingAudit': directory_role_mapping_event,
     }
 
+    # Set the date to retrieve events from Nutanix Cluster
     eventsURL = create_event_rest_url(investigate_date)
+
+    # Call the Acropolis REST API for Events
     serverResponse = my_session.get(eventsURL)
+
+    # Load response from Nutanix Cluster into JSON object and then create list of events with account id,
+    # event message, and time of event.  Also create list of unique account for filtering functions
     json_events = json.loads(serverResponse.text)
-    # print json2html.convert(json=json_events)
     event_list = []
     unique_accounts = set()
     for element in json_events['entities']:
