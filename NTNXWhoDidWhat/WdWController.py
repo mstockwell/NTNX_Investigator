@@ -230,13 +230,13 @@ def get_events_data(investigate_date):
     event_list = []
     unique_accounts = set()
     for element in json_events['entities']:
-        event_time = time.gmtime(element.get('createdTimeStampInUsecs')/1000000)
+        event_time = time.localtime(element.get('createdTimeStampInUsecs')/1000000)
         try:
             event_user, event_msg = event_types[element.get('alertTypeUuid')]()
         except KeyError:
             event_user = "Unknown"
             event_msg = "An event not captured by Who did What"
-        event_list.append((event_user, event_msg,time.strftime('%H:%M:%S', event_time)))
+        event_list.append((event_user, event_msg,time.strftime('%I:%M:%S %p %Z', event_time)))
         unique_accounts.add(event_user)
     event_list.sort(key=lambda tup: tup[2])
     return list(unique_accounts), event_list
