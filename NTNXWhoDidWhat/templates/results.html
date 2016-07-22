@@ -9,7 +9,7 @@
       <a href="{{ url_for('querymainpage') }}">Select a Different Date</a>
       {% if num_events != 0 %}
       <p>
-      <form name="form-input" action="/results" method='POST'>
+      <form name="form-input" action="{{ url_for('results') }}" method='POST'>
 
           <select name="account_id">
               <option value="all_accounts">All Accounts</option>
@@ -24,7 +24,7 @@
   <thead>
     <th>Account Id</th>
     <th>Logged Event</th>
-    <th>Time of Event &#8593;&#8595;</th>
+    <th>Time of Event &#8595;</th>
   </thead>
   <tbody>
 {% for row in events_list %}

@@ -7,7 +7,7 @@ from json2html import *
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 my_session = requests.Session()
-
+requests.packages.urllib3.disable_warnings()
 
 def test_credentials(username, password, ip_address):
     session['ip_address'] = ip_address
@@ -222,6 +222,7 @@ def get_events_data(investigate_date):
     eventsURL = create_event_rest_url(investigate_date)
 
     # Call the Acropolis REST API for Events
+
     serverResponse = my_session.get(eventsURL)
 
     # Load response from Nutanix Cluster into JSON object and then create list of events with account id,
