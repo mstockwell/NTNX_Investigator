@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Nutanix WdW</title>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
+{% extends "base.html" %}
+{% block content %}
+
     <div class="wrapper">
       <center>
           <img src="{{ url_for('static', filename='ntnx-logo.jpeg') }} "alt="Nutanix">
-          <h1> Welcome to Who Did What</h1>
+          <h1> Welcome to Nutanix Event Log Search (ELS)</h1>
       </center>
             <form class="form-signin" action="" method="post">
                 <h2>Connect to Nutanix</h2>
@@ -21,11 +16,6 @@
           request.form.password }}">
               <button class="button big-btn" type="submit" value="Login">Connect</button>
             </form>
-          {% if error %}
-        <div class="wrapper">
-          <p class="error"><strong>Error:</strong> {{ error }} </p>
-          {% endif %}
-        </div>
     </div>
-  </body>
-</html>
+
+{% endblock %}

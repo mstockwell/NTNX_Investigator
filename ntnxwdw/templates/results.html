@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<title>Events</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='main.css') }}">
-<body>
-<div class=page>
+{% extends "base.html" %}
+{% block content %}
+
   <center>
   <h1>Cluster {{ cluster_name }} has {{ num_events }} Events from {{ investigate_date }}</h1>
       <a href="{{ url_for('querymainpage') }}">Select a Different Date</a>
@@ -40,5 +37,6 @@
       {% endif %}
 </div>
 </center>
-</body>
-</html>
+
+
+{% endblock %}

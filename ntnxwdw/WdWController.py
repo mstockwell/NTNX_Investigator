@@ -1,22 +1,23 @@
-from flask import session
+from flask import session, Flask
 import requests
 import datetime
 import time
 import json
-from json2html import *
+import sys
 
 REST_URL_SUFFIX = 'https://%s:9440/PrismGateway/services/rest/v1'
 my_session = requests.Session()
 requests.packages.urllib3.disable_warnings()
 
+
 def test_credentials(username, password, ip_address):
     session['ip_address'] = ip_address
     base_url = REST_URL_SUFFIX%session['ip_address']
     my_session.auth = (username, password)
-    my_session.verify = False
     my_session.headers.update({'Content-Type': 'application/json; charset=utf-8'})
-    serverResponse = my_session.get(base_url + "/cluster", timeout=20)
+    serverResponse = my_session.get(base_url + "/cluster", timeout=20, verify=False)
     return serverResponse.status_code, json.loads(serverResponse.text)
+
 
 def get_events_data(investigate_date):
     def create_event_rest_url(date):
@@ -122,7 +123,8 @@ def get_events_data(investigate_date):
 
     def upgrade_info_event():
         user_info = element.get('contextValues')[-1]
-        event_info = element.get('contextValues')[1].replace('{protection_domain_name}', element.get('contextValues')[0])
+        event_info = element.get('contextValues')[1].replace('{protection_domain_name}',
+                                                             element.get('contextValues')[0])
         return user_info, event_info
 
     def software_release_event():
@@ -160,7 +162,6 @@ def get_events_data(investigate_date):
         user_info = element.get('contextValues')[-1]
         event_info = element.get('contextValues')[0]
         return user_info, event_info
-
 
     def cluster_params_event():
         user_info = element.get('contextValues')[-1]
@@ -209,7 +210,7 @@ def get_events_data(investigate_date):
         'NFSWhiteListAudit': nfs_whitelist_event,
         'PdOOBScheduleAudit': pd_OOB_sched_event,
         'PulseAudit': pulse_event,
-        'RemoteSupportAudit' : remote_support_event,
+        'RemoteSupportAudit': remote_support_event,
         'SnmpInfoAudit': snmp_info_event,
         'ClusterParamsAudit': cluster_params_event,
         'HealthCheckPluginAudit': health_check_plugin_event,
@@ -222,8 +223,7 @@ def get_events_data(investigate_date):
     eventsURL = create_event_rest_url(investigate_date)
 
     # Call the Acropolis REST API for Events
-
-    serverResponse = my_session.get(eventsURL)
+    serverResponse = my_session.get(eventsURL, timeout=20, verify=False)
 
     # Load response from Nutanix Cluster into JSON object and then create list of events with account id,
     # event message, and time of event.  Also create list of unique account for filtering functions
@@ -237,17 +237,21 @@ def get_events_data(investigate_date):
         except KeyError:
             event_user = "Unknown"
             event_msg = "An event not captured by Who did What"
-        event_list.append((event_user, event_msg,time.strftime('%I:%M:%S %p %Z', event_time)))
+        event_list.append((event_user, event_msg, time.strftime('%I:%M:%S %p %Z', event_time)))
         unique_accounts.add(event_user)
     event_list.sort(key=lambda tup: tup[2])
     return list(unique_accounts), event_list
 
 
-from NTNXWhoDidWhat import app
+# app = Flask(__name__)
+# app.secret_key = '023aM47zz19Sx873yew9321Pl8746'
+# app.config.from_object(__name__)
+
+from ntnxwdw import app
 
 if __name__ == '__main__':
     try:
-        app.run(debug=True)
+        app.run(debug=False)
     except Exception as ex:
         print ex
         sys.exit(1)

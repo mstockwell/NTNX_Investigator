@@ -1,5 +1,4 @@
-from NTNXWhoDidWhat import app
-from WdWController import test_credentials, get_events_data
+from WdWcontroller import app, test_credentials, get_events_data
 from flask import request, render_template, redirect, url_for, session
 
 
@@ -64,3 +63,9 @@ def results():
                                investigate_date=session["investigate_date"])
     else:
         return render_template('querymainpage.html', cluster_name=session["cluster_name"], error=error)
+
+
+@app.errorhandler(500)
+def internal_error(exception):
+    app.logger.error(exception)
+    return render_template('500.html'), 500
