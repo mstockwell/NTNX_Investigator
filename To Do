@@ -1,13 +1,16 @@
 To do list:
 
-Must Have
-Add more events
-Consistent UI formatting
-Link from Result Page back to Query Page
-Error Checking if not connected
-Error Checking if event type not found
+Refactor code to consolidate events parsing
+Implement Flask Blueprints for Modularization (place REST APIs into independent module to share with others)
+Implement WTForms 
+Filtering JSON?
 
+New Funtions:
+Pagination
+Sort on Time of Event
+Add server side persistence
 
-Nice to have
-Filter based on User or Event type
-Pagination 
+Stretch:
+
+Download all events since cluster created with ability to search across days
+
