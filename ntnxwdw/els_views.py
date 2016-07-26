@@ -11,7 +11,8 @@ def homepage():
         username = request.form['username']
         password = request.form['password']
         try:
-            status, cluster_info = test_credentials(username, password, ip_address)
+            nc = NutanixCluster()
+            status, cluster_info = nc.get_cluster(username, password, ip_address)
             if status == 200:
                 session["cluster_name"] = cluster_info.get('name')
                 return redirect(url_for('querymainpage', cluster_name=session["cluster_name"]))
@@ -30,7 +31,9 @@ def querymainpage():
         if session["investigate_date"] != "":
             try:
                 ne = NutanixEvents()
-                session["unique_accounts"], events = ne.get_events(session["investigate_date"])
+                session["unique_accounts"], events = ne.get_events(session["investigate_date"],
+                                                                   session['username'], session['password'],
+                                                                   session['ip_address'])
                 return render_template('results.html', cluster_name=session["cluster_name"],
                                        num_events=len(events),
                                        unique_accounts=session["unique_accounts"], events_list=events,
@@ -50,7 +53,9 @@ def results():
     if request.method == 'POST':
         try:
             ne = NutanixEvents()
-            session["unique_accounts"], events = ne.get_events(session["investigate_date"])
+            session["unique_accounts"], events = ne.get_events(session["investigate_date"],
+                                                               session['username'], session['password'],
+                                                               session['ip_address'])
         except Exception as e:
             return render_template("error.html", error=str(e))
         unique_account = request.form['account_id']

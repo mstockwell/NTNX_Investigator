@@ -1,9 +1,8 @@
 To do list:
 
 Refactor code to consolidate events parsing
-Implement Flask Blueprints for Modularization (place REST APIs into independent module to share with others)
-Implement WTForms 
-Filtering JSON?
+Implement Flask Blueprints for Modularization
+Implement WTForms
 
 New Funtions:
 Pagination
