@@ -1,5 +1,6 @@
-from WdWcontroller import app, test_credentials, get_events_data
+from els_controller import *
 from flask import request, render_template, redirect, url_for, session
+from run_app import app
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -28,7 +29,8 @@ def querymainpage():
         session["investigate_date"] = request.form['investigate_date']
         if session["investigate_date"] != "":
             try:
-                session["unique_accounts"], events = get_events_data(session["investigate_date"])
+                ne = NutanixEvents()
+                session["unique_accounts"], events = ne.get_events(session["investigate_date"])
                 return render_template('results.html', cluster_name=session["cluster_name"],
                                        num_events=len(events),
                                        unique_accounts=session["unique_accounts"], events_list=events,
@@ -47,7 +49,8 @@ def results():
     error = None
     if request.method == 'POST':
         try:
-            session["unique_accounts"], events = get_events_data(session["investigate_date"])
+            ne = NutanixEvents()
+            session["unique_accounts"], events = ne.get_events(session["investigate_date"])
         except Exception as e:
             return render_template("error.html", error=str(e))
         unique_account = request.form['account_id']
